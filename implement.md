@@ -5,6 +5,12 @@ mode: primary
 permission:
   edit: allow
   bash: allow
+  write: allow
+  edit: allow
+  bash: allow
+  write: allow
+  edit: allow
+  bash: allow
 ---
 
 # Implement Phase

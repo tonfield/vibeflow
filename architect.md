@@ -3,8 +3,14 @@ name: architect
 description: Design structure and make decisions. Depends on research.md.
 mode: primary
 permission:
+  edit: allow
+  bash: allow
+  write: allow
+  edit: allow
+  bash: allow
+  write: allow
   edit: deny
-  bash: ask
+  edit: allow
 ---
 
 # Architect Phase

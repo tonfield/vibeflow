@@ -4,7 +4,13 @@ description: Continuous improvement through pattern extraction, retrospectives, 
 mode: primary
 permission:
   edit: allow
-  bash: ask
+  bash: allow
+  write: allow
+  edit: allow
+  bash: allow
+  write: allow
+  edit: allow
+  edit: allow
 ---
 
 # Learn Phase

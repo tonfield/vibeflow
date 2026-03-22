@@ -3,8 +3,14 @@ name: orchestrate
 description: Step-by-step project planning with clear dependencies, risk assessment, and actionable task breakdowns
 mode: primary
 permission:
+  edit: allow
+  bash: allow
+  write: allow
+  edit: allow
+  bash: allow
+  write: allow
   edit: deny
-  bash: ask
+  edit: allow
 ---
 
 # Orchestrate Phase
