@@ -13,9 +13,13 @@ echo "Copying vibeflow to $TARGET_DIR..."
 mkdir -p "$TARGET_DIR"
 cp -r "$VIBEFLOW_SOURCE"/* "$TARGET_DIR/"
 
-# 2. Copy agents
+# 2. Copy agents (exclude README.md)
 echo "Copying agents..."
-cp "$TARGET_DIR"/*.md "$OPENCODE_CONFIG/agents/"
+for f in "$TARGET_DIR"/*.md; do
+    if [ "$(basename "$f")" != "README.md" ]; then
+        cp "$f" "$OPENCODE_CONFIG/agents/"
+    fi
+done
 
 # 3. Copy plugin
 echo "Copying plugin..."
