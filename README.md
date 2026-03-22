@@ -1,115 +1,137 @@
 # Vibeflow
 
-A stateless, interactive workflow system for OpenCode with agile practices built-in.
+A self-sufficient, interactive workflow system for OpenCode with agile practices built-in.
 
 ## Philosophy
 
-**Vibeflow** replaces rigid phasebook-style workflows with a more interactive, general-purpose approach. Each phase is a capable agent that:
-- Can handle any task within its domain
-- Uses task/ledger tracking aggressively
+**Vibeflow** modes are self-sufficient - each can run standalone or with context from other modes. User controls the flow, not a rigid sequence.
+
+Each mode:
+- Works standalone (no required sequence)
+- Uses context from other modes if it exists
 - Asks questions proactively
-- Tests hypotheses before claiming truth
-- Creates documentation and artifacts
+- Tracks everything with [TASK], [CLAIM], [ASSUMPTION]
 
-## Phases
+## Modes
 
-| Phase | Agent Type | Focus |
-|-------|-----------|-------|
-| `research` | Senior Technical Researcher | Investigation, hypotheses, testing, claims |
-| `architect` | Principal Architect | Systems thinking, diagrams, trade-offs |
+| Mode | Role | Focus |
+|------|------|-------|
+| `research` | Senior Technical Researcher | Investigation, hypothesis testing, evidence |
+| `architect` | Principal Architect | System design, diagrams, trade-offs |
 | `orchestrate` | Technical Program Manager | Sprint planning, task breakdown |
 | `implement` | Software Engineer | Working code, tests, verification |
 | `learn` | Technical Coach | Patterns, retrospectives, knowledge base |
 
 ## Key Features
 
-- **Interactive** - Agents ask questions, don't just assume
-- **Task/Ledger tracking** - Everything tracked with todowrite
-- **Test-driven** - Implementation includes tests
-- **Pattern extraction** - Patterns saved to AGENTS.md
-- **General-purpose** - Can handle any task appropriately for the phase
+- **Self-sufficient** - Any mode can run standalone
+- **User controls flow** - Jump between modes as needed
+- **Context-aware** - Uses existing documents if available
+- **3 tags everywhere** - [TASK], [CLAIM], [ASSUMPTION]
 
 ## Installation
 
 ### From GitHub (Recommended)
 
 ```bash
-# Clone the repo
 git clone https://github.com/tonfield/vibeflow.git ~/projects/vibeflow
-
-# Run install script
 ~/projects/vibeflow/install.sh
 ```
 
 ### Manual Install
 
 ```bash
-# 1. Copy vibeflow folder
-cp -r ~/projects/vibeflow ~/.config/opencode/vibeflow
+# Copy agents
+cp ~/projects/vibeflow/*.md ~/.config/opencode/agents/
 
-# 2. Copy agents
-cp ~/.config/opencode/vibeflow/*.md ~/.config/opencode/agents/
+# Copy plugin
+cp ~/projects/vibeflow/plugins/vibeflow.ts ~/.config/opencode/plugins/
 
-# 3. Copy plugin
-cp ~/.config/opencode/vibeflow/plugins/vibeflow.ts ~/.config/opencode/plugins/
+# Add to opencode.json: "plugin": ["vibeflow"]
 
-# 4. Add plugin to opencode.json
-# Add: "plugin": ["vibeflow"] to your opencode.json
-
-# 5. Restart OpenCode
-```
-
-## Updating
-
-```bash
-cd ~/projects/vibeflow && git pull
-~/projects/vibeflow/install.sh
+# Restart OpenCode
 ```
 
 ## Usage
 
-### Tab Through Phases
+### Tab Through Modes
 
-Use **Tab** to cycle through vibeflow phases:
-- `research` → Deep investigation
-- `architect` → Design decisions
-- `orchestrate` → Sprint planning
+Use **Tab** to switch between modes:
+- `research` → Investigation
+- `architect` → Design
+- `orchestrate` → Planning
 - `implement` → Implementation
-- `learn` → Pattern extraction
+- `learn` → Learning
 
-### Task/Ledger System
+### User Controls Flow
 
-Every phase uses aggressive task tracking:
+```
+@research "Investigate auth options"
+@architect "Design auth system"  
+@orchestrate "Plan the build"
+@implement "Build it"
+@learn "Extract patterns"
+```
+
+Or jump around:
+```
+@architect "Quick design question"
+@implement "Just build this one feature"
+@learn "What did we learn?"
+```
+
+## The 3 Tags
+
+Every mode uses the same 3 tags:
 
 ```javascript
 todowrite({
   todos: [
-    { content: "[TASK] Investigate auth patterns", status: "in_progress", priority: "high" },
-    { content: "[CLAIM] Auth middleware validates JWT", status: "completed", priority: "high" },
-    { content: "[ASSUME] Using JWT over sessions", status: "pending", priority: "medium" },
-    { content: "[RISK] Redis becomes single point of failure", status: "pending", priority: "medium" },
+    // WORK - tasks to complete
+    { content: "[TASK] Implement JWT middleware", status: "pending", priority: "high" },
+    
+    // VERIFY - claims to verify
+    { content: "[CLAIM] Auth validates JWT tokens", status: "pending", priority: "high" },
+    
+    // TOLERATED - accepted risks
+    { content: "[ASSUMPTION] Using RS256 signing", status: "pending", priority: "medium" },
   ]
 })
 ```
 
-### Claim Tags
+### Status Meanings
 
-| Tag | Meaning |
-|-----|---------|
-| `[TASK]` | Actionable task |
-| `[CLAIM]` | Statement requiring verification |
-| `[ASSUME]` | Assumption (may be wrong) |
-| `[TRACE]` | Data flow to verify |
-| `[NEGATION]` | "No other X" claim |
-| `[GAP]` | Knowledge gap |
-| `[QUESTION]` | Open question |
-| `[DECISION]` | Architectural decision |
-| `[RISK]` | Risk identified |
-| `[PATTERN]` | Reusable pattern discovered |
-| `[GOTCHA]` | Pitfall to avoid |
-| `[BUG]` | Bug to fix |
+| Tag | pending | in_progress | completed | cancelled |
+|-----|---------|--------------|----------|-----------|
+| [TASK] | To do | Doing | Done | Won't do |
+| [CLAIM] | Unverified | Verifying | **Verified** | Rejected |
+| [ASSUMPTION] | Unconfirmed | Confirming | **Confirmed** | Invalidated |
 
-### Reviews
+### Same Tags, Different Meanings
+
+| Mode | [TASK] means | [CLAIM] means | [ASSUMPTION] means |
+|------|--------------|----------------|---------------------|
+| research | Investigate | Verify exists/work | Accept starting point |
+| architect | Design component | Design satisfies | Accept design risk |
+| orchestrate | Build task | Implementation satisfies | Accept sprint risk |
+| implement | Write code | Code works | Confirm library behavior |
+| learn | Extract pattern | Document verified | Document learned |
+
+## Mode Context
+
+Each mode checks for existing documents:
+
+| Mode | Checks For |
+|------|-----------|
+| research | Other modes (uses if available) |
+| architect | research.md |
+| orchestrate | architect.md |
+| implement | orchestrate.md, architect.md |
+| learn | All phases |
+
+If documents exist, mode uses them. If not, works standalone.
+
+## Reviews
 
 Use `@review` for parallel multi-perspective review:
 
@@ -120,59 +142,49 @@ Use `@review` for parallel multi-perspective review:
 @review "challenge this approach"
 ```
 
-## Architecture
+### Reviewers
 
-```
-research → architect → orchestrate → implement → learn
-    ↓           ↓            ↓            ↓
-  @review     @review      @review     @review
-```
-
-### Research
-- Investigates thoroughly
-- Tests hypotheses with scripts
-- Searches web for best practices
-- Creates evidence-based claims
-- Asks questions proactively
-
-### Architect
-- Thinks big picture
-- Creates diagrams (Mermaid)
-- Makes trade-off decisions
-- Identifies risks
-- Challenges assumptions
-
-### Orchestrate
-- Breaks into sprint tasks
-- User stories + technical tasks
-- Assigns priorities
-- Maps dependencies
-- Creates sprint boards
-
-### Implement
-- Writes working code
-- Tests everything
-- Verifies each step
-- Clean refactoring
-- Keeps scope tight
-
-### Learn
-- Extracts patterns
-- Documents gotchas
-- Updates AGENTS.md
-- Archives artifacts
-- Retrospectives
+| Reviewer | Focus |
+|----------|-------|
+| `@reviewer-logic` | Logical consistency, completeness |
+| `@reviewer-risk` | Risk, assumptions, failure modes |
+| `@reviewer-codebase` | Verify claims against actual code |
+| `@challenge` | Adversarial review |
 
 ## Documents
 
-Each phase creates/updates documents:
-- `research.md` - Evidence and claims
-- `architect.md` - Architecture decisions
+Each mode creates/updates its document:
+- `research.md` - Investigation findings
+- `architect.md` - Design decisions
 - `orchestrate.md` - Sprint plan
 - `implement.md` - Implementation notes
 - `learn.md` - Patterns and retrospective
 
 Documents are session-based (survive via compaction).
+
+## Example Flow
+
+```
+User: "@research Find auth patterns in the codebase"
+
+research mode:
+- Looks for existing documents (none found)
+- Creates [TASK], [CLAIM], [ASSUMPTION]
+- Investigates thoroughly
+- Updates todowrite
+- Creates research.md
+
+User: "@architect Design auth system"
+
+architect mode:
+- Finds research.md (uses it)
+- Creates [TASK], [CLAIM], [ASSUMPTION] for design
+- Designs with research context
+- Updates todowrite
+- Creates architect.md
+
+... and so on
+```
 
 ## Customization
 
@@ -192,13 +204,13 @@ Create new reviewers in `agents/` and update `review.md`.
 ## Why Vibeflow?
 
 ### vs Phasebook
-- More interactive (questions, hypotheses)
-- General-purpose phases (not just code)
-- Simpler structure
+- Self-sufficient modes (not rigid sequence)
+- User controls flow
+- Simpler 3-tag system
 - Less ceremony
 
 ### vs Default OpenCode
-- Structured workflow for complex tasks
+- Structured approach for complex tasks
 - Built-in review system
-- Task/ledger tracking
+- Task/claim tracking
 - Pattern extraction
