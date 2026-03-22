@@ -1,79 +1,79 @@
 ---
 name: implement
-description: Implement the solution. Depends on orchestrate.md.
+description: Write the code and make it work.
 mode: primary
 permission:
   edit: allow
   bash: allow
 ---
 
-# Implement Phase
+# Implement Mode
 
-You are in the IMPLEMENT phase. Your goal is to write the code/implementation.
+You are in IMPLEMENT mode. Your mindset: **"Let me build it and verify it works."**
 
-## Your Task
+## Your Approach
 
-1. Read `orchestrate.md` - understand the steps
-2. Read `architect.md` - understand the design
-3. Implement one step at a time
-4. Verify each step before moving on
-5. Run tests and verify everything works
+1. **Find the document** - Check for `./vibeflow/<project-name>.md` (guess project name from context)
+2. **Read existing content** - Review Plan and Architecture sections
+3. **Implement step by step** - Start with the first step, verify, then move on
+4. **Update document** - Record progress and changes made
 
-## Process
+## Working with the Project Document
 
-For each step:
-1. Read the step details
-2. Implement the changes
-3. Run tests/verify
-4. Mark step complete
-5. Move to next step
-
-## Document Structure
-
-Create an `implement.md` file with:
+The document is the single source of truth. Update your progress:
 
 ```markdown
-# Implement: <Task Name>
+# <Project Name>
 
-## Progress
+## Implementation
+### Date: <today>
 
-### Step 1: <Name>
-**Status:** IN_PROGRESS / DONE
-**Verification:** Verified by <test/command>
-```
-Changes made:
-- File: @path/to/file.ts (lines 10-25)
-- Added auth middleware function
-```
+### Progress
 
-### Step 2: <Name>
-**Status:** PENDING
+#### Step 1: <Name>
+- **Status:** IN_PROGRESS / DONE
+- **Verification:** <test/command used>
+- **Changes:**
+  - File: @path/to/file.ts (lines 10-25)
+  - <What changed>
+
+#### Step 2: <Name>
+- **Status:** PENDING
 ...
 
-## Verification
+### Verification
 ```
 ✓ Step 1: Tests pass
 ○ Step 2: Pending
 ○ Step 3: Pending
 ```
 
-## Issues Encountered
-Any problems and how they were resolved.
+### Issues Encountered
+<Problems and how they were resolved>
 
-## Notes
-Anything worth remembering for later.
+### Notes
+<Anything worth remembering>
 ```
+
+## Tags (Session Only)
+
+Use these in your session work:
+- `[TASK]` - Work to complete
+- `[CLAIM]` - Statement to verify (pending → verified/rejected)
+- `[ASSUMPTION]` - Accepted risk (pending → confirmed/invalidated)
 
 ## Exit Criteria
 
-- All steps implemented
-- All tests pass
+- Steps implemented as planned
+- Tests pass
 - Verification complete
-- Use `@review "review the code"` when ready
+- Document updated with progress
+- Ready for final review: `@review "review the code"` if needed
 
 ## Important
 
 - Implement thinnest slice first
 - Verify before moving on
 - Don't skip tests
-- If step is blocked, note it and continue with next if possible
+- If blocked, note it and continue with next step if possible
+- Keep changes focused - one logical change at a time

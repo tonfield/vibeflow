@@ -4,28 +4,32 @@ A self-sufficient, interactive workflow system for OpenCode.
 
 ## Philosophy
 
-**Vibeflow** modes are self-sufficient - each can run standalone or with context from other modes. User controls the flow, not a rigid sequence.
+**Vibeflow** modes are self-sufficient - each can run standalone or with context. User controls the flow, not a rigid sequence.
 
 Each mode:
 - Works standalone
-- Uses context from other modes if it exists
 - Asks questions proactively
 - Tracks with [TASK], [CLAIM], [ASSUMPTION]
 
 ## Modes
 
-| Mode | Role | Focus |
-|------|------|-------|
-| `research` | Senior Technical Researcher | Investigation, hypothesis testing, evidence |
-| `architect` | Principal Architect | System design, diagrams, trade-offs |
-| `orchestrate` | Technical Program Manager | Sprint planning, task breakdown |
-| `implement` | Software Engineer | Working code, tests, verification |
+| Mode | Role | Mindset |
+|------|------|---------|
+| `research` | Senior Technical Researcher | "What's there? What evidence exists?" |
+| `architect` | Principal Architect | "How should it work? What's the best design?" |
+| `orchestrate` | Technical Program Manager | "What do we do and in what order?" |
+| `implement` | Software Engineer | "Let me build it and verify it works." |
 
 ## Installation
 
 ```bash
 git clone https://github.com/tonfield/vibeflow.git ~/projects/vibeflow
-cp ~/projects/vibeflow/*.md ~/.config/opencode/agents/
+./vibeflow/install.sh
+```
+
+Or manually:
+```bash
+cp ~/projects/vibeflow/agents/*.md ~/.config/opencode/agents/
 cp ~/projects/vibeflow/plugins/vibeflow.ts ~/.config/opencode/plugins/
 # Add to opencode.json: "plugin": ["vibeflow"]
 ```
@@ -34,25 +38,46 @@ cp ~/projects/vibeflow/plugins/vibeflow.ts ~/.config/opencode/plugins/
 
 ### Tab Through Modes
 
-Use **Tab** to switch between modes:
-- `research` → Investigation
-- `architect` → Design
-- `orchestrate` → Planning
-- `implement` → Implementation
+Use **Tab** to switch between modes. Each mode works on the same project document.
 
-### User Controls Flow
+### Project Documents
+
+Each project lives in `./vibeflow/<project-name>.md`:
 
 ```
-@research "Investigate auth options"
-@architect "Design auth system"
-@orchestrate "Plan the build"
-@implement "Build it"
-/learn  # Extract patterns at end
+./vibeflow/
+├── auth-api.md      # Auth system
+├── payments.md      # Payment integration
+└── onboarding.md   # User onboarding
 ```
 
-## Tags
+The document is the **single source of truth** - everything lives there.
 
-Every mode tracks work with tags:
+### Typical Flow
+
+```
+1. User: "I'm working on auth API"
+   
+2. Tab → research    # Investigate existing auth
+   - Agent creates ./vibeflow/auth-api.md if missing
+   - Adds Research section with findings
+
+3. Tab → architect   # Design the solution
+   - Reads Research section
+   - Adds Architecture section with design decisions
+
+4. Tab → orchestrate # Plan the work
+   - Reads Research + Architecture
+   - Adds Plan section with steps
+
+5. Tab → implement   # Build it
+   - Reads Plan + Architecture
+   - Adds Implementation section with progress
+```
+
+### Tags (Session Only)
+
+Tags track work in-session, not in the document:
 
 ```javascript
 todowrite({
@@ -64,44 +89,28 @@ todowrite({
 })
 ```
 
-### Tag Meanings
-
 | Tag | Meaning | Statuses |
 |-----|---------|----------|
 | [TASK] | Work to complete | pending → in_progress → completed |
 | [CLAIM] | Statement to verify | pending → completed (verified) / cancelled (rejected) |
 | [ASSUMPTION] | Accepted risk | pending → completed (confirmed) / cancelled (invalidated) |
 
-## Mode Context
-
-Each mode checks for existing documents:
-
-| Mode | Checks For |
-|------|-----------|
-| research | Other modes if available |
-| architect | research.md |
-| orchestrate | architect.md |
-| implement | orchestrate.md, architect.md |
-
 ## Commands
 
 | Command | What it does |
 |---------|--------------|
-| `/learn` | Extract patterns from current work |
-| `/review` | Run parallel review |
+| `/learn` | Extract patterns from current project to AGENTS.md |
+| `/status` | Show current session state |
 
-### Reviews
+## Reviews
 
 Use `@review` for multi-perspective review:
 
 ```
 @review "review the research"
 @review "review the architecture"
-@review "review the code"
 @review "challenge this approach"
 ```
-
-#### Reviewers
 
 | Reviewer | Focus |
 |----------|-------|
@@ -110,15 +119,52 @@ Use `@review` for multi-perspective review:
 | `@reviewer-codebase` | Verify claims against actual code |
 | `@challenge` | Adversarial review |
 
-## Documents
+## Document Structure
 
-Each mode creates/updates its document:
-- `research.md` - Investigation findings
-- `architect.md` - Design decisions
-- `orchestrate.md` - Sprint plan
-- `implement.md` - Implementation notes
+Each project document evolves naturally:
 
-Documents are session-based (survive via compaction).
+```markdown
+# Auth API
+
+## Research
+### Date: 2026-03-22
+- Investigated existing auth middleware
+- Found: JWT validation at middleware/auth.ts:45-67
+- [CLAIM] All routes protected by single middleware
+- [TRACE] login → auth → session → response
+
+## Architecture
+### Date: 2026-03-22
+### Context
+<Problem summary from research>
+
+### Design Decisions
+#### Decision: Token format
+- **Choice:** JWT with RS256
+- **Alternatives:** HMAC (rejected because...)
+
+### Data Flow
+```
+Request → JWT Validation → Session → Database → Response
+```
+
+## Plan
+### Date: 2026-03-22
+### Steps
+#### Step 1: Add JWT validation
+- **Risk:** LOW
+- **Depends on:** (none)
+- **Verification:** Tests pass
+
+## Implementation
+### Date: 2026-03-22
+#### Step 1: Add JWT validation
+- **Status:** DONE
+- **Verification:** npm test passes
+- **Changes:**
+  - Added middleware/auth.ts
+  - Tests added: tests/auth.test.ts
+```
 
 ## Customization
 
